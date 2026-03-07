@@ -1,0 +1,46 @@
+# Python bytecode
+__pycache__/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Personal config (gitignored — copy from config.example.yaml)
+config.yaml
+
+# Calibration data (personal estimation history)
+context/calibration.md
+
+# Session scratch files
+context/notes/scratch-*
+
+# Local overrides
+*.local.yaml
+secrets/
+
+# Junctions/symlinks created by setup.sh (NOT committed to git)
+.claude/CLAUDE.md
+.claude/agents
+.claude/hooks
+.claude/skills
+.cursor/agents
+.cursor/hooks
+.cursor/skills
+.cursor/mcp.json
+
+# Machine-specific generated config
+scripts/windows/wt-config.sh
+
+# Claude Code local settings (machine-specific permissions)
+.claude/settings.local.json
+
+# Entire CLI (session data, not committed)
+.entire/
+
+# Machine-specific .cmd config
+scripts/windows/bin/wt-config.cmd

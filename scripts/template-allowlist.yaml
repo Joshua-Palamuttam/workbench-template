@@ -1,0 +1,72 @@
+# Template Allowlist — Inverted: only explicitly listed paths sync to the public template
+# Skills are EXCLUDED by default. Add each one explicitly.
+# Run /template-sync to sync. New skills never accidentally leak.
+
+include:
+  # --- Agents, hooks, mcp (all safe) ---
+  - .agents/agents/
+  - .agents/hooks/
+  - .agents/mcp.json
+
+  # --- Skills (EXPLICIT per-skill allowlist) ---
+  - .agents/skills/calendar-sync/
+  - .agents/skills/capacity/
+  - .agents/skills/confluence-review/
+  - .agents/skills/cut-release/
+  - .agents/skills/daily-checkin/
+  - .agents/skills/delegate-or-own/
+  - .agents/skills/doctor/
+  - .agents/skills/draft-reply/
+  - .agents/skills/end-of-day/
+  - .agents/skills/estimate/
+  - .agents/skills/feature-worktree-create/
+  - .agents/skills/hotfix/
+  - .agents/skills/interrupt/
+  - .agents/skills/jira-review/
+  - .agents/skills/log-interrupt/
+  - .agents/skills/meeting-prep/
+  - .agents/skills/morning-triage/
+  - .agents/skills/plan-create/
+  - .agents/skills/plan-feature/
+  - .agents/skills/plan-resume/
+  - .agents/skills/pr-context/
+  - .agents/skills/quarterly-goals/
+  - .agents/skills/research/
+  - .agents/skills/setup/
+  - .agents/skills/skill-import/
+  - .agents/skills/slack-catch-up/
+  - .agents/skills/sounding-board/
+  - .agents/skills/standup/
+  - .agents/skills/status-report/
+  - .agents/skills/sync-permissions/
+  - .agents/skills/template-sync/
+  - .agents/skills/ticket-breakdown/
+  - .agents/skills/weekly-plan/
+  - .agents/skills/weekly-retro/
+  - .agents/skills/what-next/
+  - .agents/skills/worktrees/
+  - .agents/skills/wrap-up/
+  # NOTE: debug-appinsights intentionally ABSENT (company-specific)
+
+  # --- Scripts (explicit, excluding private) ---
+  - scripts/lib.sh
+  - scripts/setup.sh
+  - scripts/doctor.sh
+  - scripts/skill-add.sh
+  - scripts/setup-global-skills.sh
+  - scripts/template-sync.sh
+  - scripts/skill-registry.yaml
+  - scripts/template-allowlist.yaml
+  - scripts/windows/
+  - scripts/mac/
+  # NOTE: scripts/appinsights/ intentionally ABSENT (company-specific)
+
+  # --- Other ---
+  - .claude/settings.json
+  - templates/
+  - config.example.yaml
+  - context/calibration.example.md
+  - AGENTS.md
+  - README.md
+  - .gitignore
+  - .gitattributes

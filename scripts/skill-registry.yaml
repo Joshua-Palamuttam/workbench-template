@@ -1,0 +1,20 @@
+# Skill Registry — Known-good skills available for import
+# Use: bash scripts/skill-add.sh <name> or bash scripts/skill-add.sh --list
+#
+# Each entry has:
+#   url: GitHub URL to the skill directory (tree URL format)
+#   description: What the skill does
+
+skills:
+  commit:
+    url: "https://github.com/anthropics/claude-code/tree/main/.claude/skills/commit"
+    description: "Generate well-structured git commit messages"
+
+  create-pr:
+    url: "https://github.com/anthropics/claude-code/tree/main/.claude/skills/create-pr"
+    description: "Create pull requests with structured descriptions"
+
+  # Add more community skills here as they emerge
+  # example-skill:
+  #   url: "https://github.com/user/repo/tree/main/.claude/skills/example-skill"
+  #   description: "What it does"

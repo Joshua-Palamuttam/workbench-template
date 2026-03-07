@@ -1,0 +1,156 @@
+# Workbench Configuration
+#
+# Copy this file to config.yaml and fill in your values.
+# config.yaml is gitignored and will never be committed.
+#
+# Usage: AGENTS.md instructs Claude to read this file at session start,
+# making all values available in context for every agent.
+
+# --- Identity & Org ---
+
+user:
+  name: "Jane Smith"
+  role: "Principal Software Engineer"
+  organization: "Acme Corp"
+  slack_display_name: "@Jane Smith"
+
+# --- GitHub ---
+
+github:
+  org: "acme-corp"
+  repositories:
+    - "acme-corp/api-server"
+    - "acme-corp/web-client"
+    - "acme-corp/shared-libs"
+    - "acme-corp/infra"
+
+# --- Jira ---
+
+jira:
+  projects:
+    - key: "PROJ"
+      name: "Main Product"
+      description: "Core product features and bugs"
+      ticket_pattern: "PROJ-NNNN"
+    - key: "INFRA"
+      name: "Infrastructure"
+      description: "Platform and infrastructure work"
+      ticket_pattern: "INFRA-NNN"
+
+# --- Confluence ---
+
+confluence:
+  spaces:
+    - key: "PROJ"
+      name: "Main Product"
+      description: "Design docs, architecture RFCs, feature specs"
+    - key: "INFRA"
+      name: "Infrastructure"
+      description: "Runbooks, deployment procedures, architecture docs"
+
+# --- Slack Channels ---
+#
+# Organize by category. Agents check operations first (incidents),
+# then product (customer impact), then engineering, then general.
+
+slack:
+  channels:
+    product:
+      - name: "product-issues"
+        description: "Product bugs and customer-facing issues"
+      - name: "product-updates"
+        description: "Product announcements and changes"
+
+    engineering:
+      - name: "engineering-general"
+        description: "Engineering discussion and announcements"
+      - name: "pr-reviews"
+        description: "PR review requests and discussions"
+      - name: "backend-devs"
+        description: "Backend engineering discussion"
+
+    operations:
+      - name: "ops-alerts"
+        description: "Operational alerts and incidents"
+      - name: "deployments"
+        description: "Deployment status and coordination"
+
+    general:
+      - name: "general"
+        description: "Company-wide announcements"
+      - name: "system-alerts"
+        description: "System alerts and monitoring"
+
+# --- Teams ---
+
+teams:
+  - name: "Product Team"
+    jira_project: "PROJ"
+    confluence_space: "Main Product"
+  - name: "Infrastructure Team"
+    jira_project: "INFRA"
+    confluence_space: "Infrastructure"
+
+# --- Capacity Model ---
+
+capacity:
+  daily_productive_hours: "5-6"
+  weekly_productive_hours: "22-24"
+  meeting_overhead: "8-10"
+  slack_overhead: 3
+  context_switching: 2
+  interrupt_buffer: 3
+
+# --- Estimation Multipliers ---
+
+estimation:
+  multipliers:
+    familiar_clear: 1.5
+    familiar_unclear: 1.75
+    unfamiliar_clear: 2.0
+    unfamiliar_unclear: 2.5
+    never_touched: 3.0
+
+# --- Calendar ---
+
+calendar:
+  provider: "outlook"
+  url: "https://outlook.office.com/calendar/view/workweek"
+
+# --- Worktree Management ---
+
+worktrees:
+  root: "C:/worktrees"
+  defaults:
+    standard:
+      - main
+      - develop
+    simple:
+      - main
+  repos:
+    # - name: api-server
+    #   url: https://github.com/acme-corp/api-server.git
+    #   default_base: develop
+    #   type: standard
+    #   description: "Main API server"
+
+# --- Skills ---
+
+skills:
+  global:
+    - sounding-board
+    - estimate
+    - jira-review
+    - pr-context
+    - meeting-prep
+    - confluence-review
+    - delegate-or-own
+    - research
+    - ticket-breakdown
+    - draft-reply
+    - slack-catch-up
+
+# --- Template Sync ---
+
+template:
+  remote: "template"

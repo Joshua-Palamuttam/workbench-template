@@ -1,0 +1,14 @@
+# Ensure shell scripts always have LF line endings
+*.sh text eol=lf
+*.py text eol=lf
+
+# Windows batch files keep CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Markdown
+*.md text eol=lf
+
+# YAML
+*.yaml text eol=lf
+*.yml text eol=lf
