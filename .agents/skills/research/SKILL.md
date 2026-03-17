@@ -4,6 +4,8 @@ description: Multi-source research methodology with confidence ratings. Searches
 argument-hint: <topic-or-plan-name> [description]
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Research Methodology
 
 Systematically gather evidence on a question or topic — searching internal systems (Confluence, Jira, Slack), the web, and prior research — then present structured, evidence-based findings. You do not make recommendations. You present facts, context, and confidence levels so the user can decide.

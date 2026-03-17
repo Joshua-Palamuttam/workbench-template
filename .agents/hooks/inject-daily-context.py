@@ -5,6 +5,10 @@ import os
 import sys
 from datetime import date
 
+# Kill switch: disable non-safety hooks when WB_HOOKS_DISABLED is set
+if os.environ.get("WB_HOOKS_DISABLED"):
+    sys.exit(0)
+
 # Compute repo root from script location (.claude/hooks/ -> repo root)
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

@@ -24,7 +24,7 @@ To sync safe content to the template, run `/template-sync`.
 This workspace uses the `.agents/` directory as the **single source of truth** for all AI tooling:
 
 - **`.agents/agents/`** — Agent definitions (.md files). Each is a standalone agent invoked via Claude Code or Cursor.
-- **`.agents/skills/`** — All skills (~38). Each skill has a `SKILL.md` defining its behavior.
+- **`.agents/skills/`** — All skills (~45). Each skill has a `SKILL.md` defining its behavior.
 - **`.agents/hooks/`** — Shared hook scripts (.py files) for session lifecycle events.
 - **`.agents/mcp.json`** — MCP server configuration shared across tools.
 
@@ -267,12 +267,26 @@ Skills that should be available in every Claude Code project are listed in `conf
 
 This means a skill authored once in `.agents/skills/my-skill/SKILL.md` becomes available in every project without duplication.
 
-## Code Review Workflow
+## Implementation & Shipping Workflow
 
-When reviewing PRs, the full context flow is:
+The full engineering workflow from plan to PR:
+1. `/forge <name>` — Plan the feature (produces handoff.md + progress.md)
+2. `/implement <name>` — Execute the plan step-by-step (TDD, progress tracking, boundary checkpoints)
+3. `/ship` — Review code, create PR, link Jira, mark plan done
+
+For code review of others' PRs:
 1. Use `pr-context` agent to gather Jira ticket + design doc + Slack discussion
 2. Switch to the worktree environment: `wt-review <PR#>` in the relevant repo
 3. After review, come back here to update daily plan / respond on Slack if needed
+
+## Context Management
+
+Manage context window usage deliberately:
+
+- **Compact at logical breakpoints**, not at 95% capacity. Good moments: after completing a research phase, after a milestone, after abandoning a failed approach. The pre-compact hook preserves forge state and daily plan context automatically.
+- **If context usage exceeds ~70%**, prefer completing the current phase before starting new work. Finish what you're doing, save state, then compact or start a new session.
+- **For long multi-phase work** (like `/forge`), save state to disk between phases. The continuation.md file ensures clean handoff after compaction.
+- **Kill switch**: Set `WB_HOOKS_DISABLED=1` to disable all non-safety hooks when doing quick fixes where hook overhead isn't wanted.
 
 ## Writing Style
 

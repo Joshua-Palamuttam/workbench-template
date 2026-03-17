@@ -136,6 +136,7 @@ create_worktrees() {
         else
             git worktree add --track -b main main origin/main
         fi
+        git -C main branch --set-upstream-to=origin/main main 2>/dev/null || true
         print_success "Created main/ worktree (tracking origin/main)"
     elif git show-ref --verify --quiet "refs/remotes/origin/master"; then
         if git show-ref --verify --quiet "refs/heads/main"; then
@@ -143,6 +144,7 @@ create_worktrees() {
         else
             git worktree add --track -b main main origin/master
         fi
+        git -C main branch --set-upstream-to=origin/master main 2>/dev/null || true
         print_success "Created main/ worktree (tracking origin/master)"
     else
         print_warning "No main/master branch found"
@@ -156,6 +158,7 @@ create_worktrees() {
         else
             git worktree add --track -b develop develop origin/develop
         fi
+        git -C develop branch --set-upstream-to=origin/develop develop 2>/dev/null || true
         print_success "Created develop/ worktree (tracking origin/develop)"
     else
         print_warning "No develop branch found (skipping)"

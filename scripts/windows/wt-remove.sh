@@ -1,11 +1,14 @@
 #!/bin/bash
 # wt-remove.sh - Remove a worktree
-# Usage: wt-remove [worktree_name] [--force] [--delete-branch | --keep-branch]
+# Usage: wt-remove [worktree_name] [--force] [--delete-branch | --keep-branch] [--yes] [--stale [days]]
 
 worktree_name=""
 force_flag=""
 workdir=""
 delete_branch=""  # empty = prompt, "yes" = delete, "no" = keep
+auto_yes=false
+stale_mode=false
+stale_days=14
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -23,6 +26,17 @@ while [[ $# -gt 0 ]]; do
             ;;
         --keep-branch|-k)
             delete_branch="no"
+            shift
+            ;;
+        --yes|-y)
+            auto_yes=true
+            shift
+            ;;
+        --stale)
+            stale_mode=true
+            if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                stale_days="$2"; shift
+            fi
             shift
             ;;
         *)
@@ -51,6 +65,62 @@ else
 fi
 
 cd "$repo_root"
+
+# Stale mode: find and remove worktrees with no recent commits
+if [ "$stale_mode" = true ]; then
+    echo ""
+    echo "Finding worktrees with no commits in the last ${stale_days} days..."
+    stale_list=()
+    stale_paths=()
+    for kind in _feature _hotfix _review; do
+        [ -d "$repo_root/$kind" ] || continue
+        for d in "$repo_root/$kind"/*/; do
+            [ -d "$d" ] || continue
+            name=$(basename "$d")
+            last_commit=$(cd "$d" && git log -1 --format='%ct' 2>/dev/null || echo "0")
+            now=$(date +%s)
+            age_days=$(( (now - last_commit) / 86400 ))
+            if [ $age_days -ge $stale_days ]; then
+                stale_list+=("$name (${age_days}d old) [${kind#_}]")
+                stale_paths+=("$kind/$name")
+            fi
+        done
+    done
+
+    if [ ${#stale_list[@]} -eq 0 ]; then
+        echo "✅ No stale worktrees found (threshold: ${stale_days} days)"
+        exit 0
+    fi
+
+    echo ""
+    echo "Stale worktrees (no commits in ${stale_days}+ days):"
+    for item in "${stale_list[@]}"; do
+        echo "  - $item"
+    done
+    echo ""
+
+    if [ "$auto_yes" != true ]; then
+        read -p "Remove all? [y/N] " -n 1 -r; echo
+        [[ $REPLY =~ ^[Yy]$ ]] || { echo "Cancelled"; exit 0; }
+    fi
+
+    for i in "${!stale_list[@]}"; do
+        path="${stale_paths[$i]}"
+        branch_name=$(cd "$repo_root/$path" && git branch --show-current 2>/dev/null) || true
+        git worktree remove "$path" --force 2>/dev/null || rm -rf "$path"
+        echo "✅ Removed: $path"
+        if [ -n "$branch_name" ] && [ "$branch_name" != "main" ] && [ "$branch_name" != "master" ] && [ "$branch_name" != "develop" ]; then
+            if [ "$delete_branch" = "yes" ]; then
+                git branch -D "$branch_name" 2>/dev/null && echo "✅ Branch deleted: $branch_name"
+            elif [ "$delete_branch" != "no" ] && [ "$auto_yes" != true ]; then
+                read -p "Delete branch '$branch_name'? [y/N] " -n 1 -r; echo
+                [[ $REPLY =~ ^[Yy]$ ]] && git branch -D "$branch_name" 2>/dev/null && echo "✅ Branch deleted: $branch_name"
+            fi
+        fi
+    done
+    git worktree prune
+    exit 0
+fi
 
 # Function to get removable worktrees (excludes main, develop, master)
 get_removable_worktrees() {
@@ -207,7 +277,7 @@ else
     # Find the worktree path from name
     worktree_path=""
 
-    # Check common locations
+    # Check common locations (exact match)
     if [ -d "_feature/$worktree_name" ]; then
         worktree_path="_feature/$worktree_name"
     elif [ -d "_hotfix/$worktree_name" ]; then
@@ -217,17 +287,53 @@ else
     elif [ -d "$worktree_name" ]; then
         worktree_path="$worktree_name"
     else
-        echo "❌ Worktree not found: $worktree_name"
-        echo ""
-        echo "Available worktrees:"
-        git worktree list
-        exit 1
+        # Fuzzy match fallback
+        matches=()
+        match_paths=()
+        for kind in _feature _hotfix _review; do
+            [ -d "$repo_root/$kind" ] || continue
+            for d in "$repo_root/$kind"/*/; do
+                [ -d "$d" ] || continue
+                name=$(basename "$d")
+                if [[ "${name,,}" == *"${worktree_name,,}"* ]]; then
+                    matches+=("$name (${kind#_})")
+                    match_paths+=("$kind/$name")
+                fi
+            done
+        done
+
+        if [ ${#matches[@]} -eq 1 ]; then
+            worktree_path="${match_paths[0]}"
+            echo "📎 Matched: ${matches[0]}"
+        elif [ ${#matches[@]} -gt 1 ]; then
+            echo "Multiple matches for '$worktree_name':"
+            for i in "${!matches[@]}"; do
+                echo "  $((i+1))) ${matches[$i]}"
+            done
+            read -p "Choice: " input
+            if [[ "$input" =~ ^[0-9]+$ ]] && [ "$input" -ge 1 ] && [ "$input" -le ${#matches[@]} ]; then
+                worktree_path="${match_paths[$((input-1))]}"
+            else
+                echo "Cancelled"
+                exit 1
+            fi
+        else
+            echo "❌ Worktree not found: $worktree_name"
+            echo ""
+            echo "Available worktrees:"
+            git worktree list
+            exit 1
+        fi
     fi
 
     # Check if it's a valid worktree or just an orphaned directory
     if ! is_valid_worktree "$worktree_path"; then
         echo "⚠️  '$worktree_path' is an orphaned directory (not a registered worktree)"
-        read -p "Delete the directory anyway? [y/N] " -n 1 -r
+        if [ "$auto_yes" = true ]; then
+            REPLY="y"
+        else
+            read -p "Delete the directory anyway? [y/N] " -n 1 -r
+        fi
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             rm -rf "$worktree_path"
@@ -279,8 +385,12 @@ while [ $attempt -le $max_attempts ]; do
     if echo "$output" | grep -qi "modified or untracked"; then
         echo ""
         echo "⚠️  Worktree has modified or untracked files."
-        read -p "Force remove anyway? [y/N] " -n 1 -r
-        echo
+        if [ "$auto_yes" = true ]; then
+            REPLY="y"
+        else
+            read -p "Force remove anyway? [y/N] " -n 1 -r
+            echo
+        fi
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             force_flag="--force"
             continue
@@ -397,8 +507,12 @@ if [ -n "$branch_name" ] && [ "$branch_name" != "main" ] && [ "$branch_name" != 
         # Interactive prompt
         echo ""
         echo "The local branch '$branch_name' still exists."
-        read -p "Delete the branch? [y/N] " -n 1 -r
-        echo
+        if [ "$auto_yes" = true ]; then
+            REPLY="N"
+        else
+            read -p "Delete the branch? [y/N] " -n 1 -r
+            echo
+        fi
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             git branch -D "$branch_name" 2>/dev/null && echo "✅ Branch deleted: $branch_name" || echo "⚠️  Could not delete branch"
         else

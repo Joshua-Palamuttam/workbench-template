@@ -109,7 +109,33 @@ wtl() { git worktree list; }
 
 wtn() {
     local launch_claude=false
-    [[ "$1" == "--code" || "$1" == "-c" ]] && launch_claude=true
+
+    # Handle flags
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --code|-c) launch_claude=true; shift ;;
+            -)
+                # Go to last worktree
+                if [[ -f ~/.wt_last ]]; then
+                    local last_dir=$(cat ~/.wt_last)
+                    if [[ -d "$last_dir" ]]; then
+                        echo "$(pwd)" > ~/.wt_last
+                        cd "$last_dir"
+                        echo "$(pwd)"
+                        [[ "$launch_claude" == true ]] && claude
+                        return 0
+                    else
+                        echo "Last worktree no longer exists: $last_dir"
+                        return 1
+                    fi
+                else
+                    echo "No previous worktree"
+                    return 1
+                fi
+                ;;
+            *) shift ;;
+        esac
+    done
 
     local repo_path=""
     local git_dir=$(git rev-parse --git-common-dir 2>/dev/null)
@@ -155,6 +181,8 @@ wtn() {
     # Find and cd to path
     for candidate in "$repo_path/$name" "$repo_path/_feature/$name" "$repo_path/_hotfix/$name" "$repo_path/_review/$name"; do
         if [[ -d "$candidate" ]]; then
+            # Save current dir as last worktree
+            echo "$(pwd)" > ~/.wt_last
             cd "$candidate"
             echo "$(pwd)"
             [[ "$launch_claude" == true ]] && claude
@@ -167,6 +195,23 @@ wtn() {
 }
 
 # ============================================================
+# Claude Launchers (cc/ccd are global aliases set up by setup.sh)
+# ============================================================
+
+# Navigate to worktree and launch claude
+wtc() { wtn "$@" && claude; }
+
+# Navigate to worktree and launch claude --dangerously-skip-permissions
+wtcd() { wtn "$@" && claude --dangerously-skip-permissions; }
+
+# ============================================================
+# Aliases
+# ============================================================
+
+alias wtrm='wt-remove'
+alias wtg='wtn'
+
+# ============================================================
 # Zsh Completions
 # ============================================================
 
@@ -177,9 +222,30 @@ _wt_repos() {
 
 compdef _wt_repos wtr wtd wtm wt-status
 
-_wt_worktrees() {
+# Worktree name completion (for wt-remove, wt-hotfix-done)
+_wt_remove() {
     local repo_root=$(git rev-parse --git-common-dir 2>/dev/null || git rev-parse --git-dir 2>/dev/null)
     [[ -z "$repo_root" ]] && return
+
+    # Complete flags
+    if [[ "$PREFIX" == -* ]]; then
+        local -a flags
+        flags=(
+            '-f:Force remove'
+            '--force:Force remove'
+            '-d:Delete the associated branch'
+            '--delete-branch:Delete the associated branch'
+            '-k:Keep the associated branch'
+            '--keep-branch:Keep the associated branch'
+            '-y:Skip all confirmation prompts'
+            '--yes:Skip all confirmation prompts'
+            '--stale:Remove worktrees with no commits in N days'
+        )
+        _describe 'flag' flags
+        return
+    fi
+
+    # Complete worktree names
     local names=()
     for kind in _feature _hotfix _review; do
         [[ -d "$repo_root/$kind" ]] || continue
@@ -190,7 +256,23 @@ _wt_worktrees() {
     compadd -a names
 }
 
-compdef _wt_worktrees wt-remove wt-hotfix-done
+compdef _wt_remove wt-remove wtrm wt-hotfix-done
+
+# wtn completion (flags only since it's interactive)
+_wtn() {
+    if [[ "$PREFIX" == -* ]]; then
+        local -a flags
+        flags=(
+            '-c:Launch Claude Code after navigating'
+            '--code:Launch Claude Code after navigating'
+            '-:Go to last worktree'
+        )
+        _describe 'flag' flags
+        return
+    fi
+}
+
+compdef _wtn wtn wtg wtc wtcd
 
 # Silenced to avoid p10k instant prompt warning
 # To check: run `wt-status` or `wtr` to list repos

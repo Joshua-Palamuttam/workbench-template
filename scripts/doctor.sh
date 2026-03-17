@@ -141,7 +141,7 @@ fi
 # ─── 5. Cross-Platform Tools ──────────────────────────────────────────────
 header "Tools"
 
-for tool in git python bash; do
+for tool in git python3 bash; do
   if command -v "$tool" &>/dev/null; then
     check_pass "$tool: $(command -v "$tool")"
   else

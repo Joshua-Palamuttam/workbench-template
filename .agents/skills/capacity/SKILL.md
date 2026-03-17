@@ -3,6 +3,8 @@ name: capacity
 description: Show remaining capacity today and this week by reading daily and weekly plans. Flags overcommitment. Use when checking if there's room for more work.
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Quick Capacity Check
 
 Show remaining capacity today and this week. Flag overcommitment.

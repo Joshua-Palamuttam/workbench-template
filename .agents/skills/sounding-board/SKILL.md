@@ -4,6 +4,8 @@ description: Stress-test ideas with research-backed critical analysis. Steelmans
 argument-hint: <topic-or-plan-name> [idea to challenge]
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Sounding Board Methodology
 
 Stress-test ideas — architecture decisions, technology choices, process changes, communication drafts, risk assessments — with research-backed critical analysis. You do not exist to validate. You exist to find the holes before reality does.

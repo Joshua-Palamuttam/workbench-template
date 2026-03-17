@@ -29,6 +29,15 @@
             "command": "entire hooks claude-code pre-task"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .agents/hooks/suggest-review.py"
+          }
+        ]
       }
     ],
     "SessionEnd": [

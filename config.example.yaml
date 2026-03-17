@@ -6,6 +6,14 @@
 # Usage: AGENTS.md instructs Claude to read this file at session start,
 # making all values available in context for every agent.
 
+# --- Workbench Root ---
+# Absolute path to the workbench worktree. All skills resolve context/,
+# plans, and archives relative to this path — even when invoked globally
+# from another repository. Auto-set by setup.sh.
+
+workbench:
+  root: "__WORKBENCH_ROOT__"
+
 # --- Identity & Org ---
 
 user:

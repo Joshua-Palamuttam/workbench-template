@@ -3,8 +3,15 @@
 # Usage: wt-status [repo_name]
 
 WORKTREE_ROOT="${WORKTREE_ROOT:-C:/worktrees-SeekOut}"
+repo_filter=""
+dirty_only=false
 
-repo_filter=$1
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dirty) dirty_only=true; shift ;;
+        *) repo_filter="$1"; shift ;;
+    esac
+done
 
 cd "$WORKTREE_ROOT"
 
@@ -51,6 +58,9 @@ for repo in *.git/; do
                 [ "$ahead" -gt 0 ] && sync+=" ↑${ahead}"
                 [ "$behind" -gt 0 ] && sync+=" ↓${behind}"
 
+                if [ "$dirty_only" = true ] && [ "$changes" -eq 0 ]; then
+                    continue
+                fi
                 printf "  %-20s %-30s %s%s\n" "$wt_name" "$branch" "$status" "$sync"
             fi
         fi

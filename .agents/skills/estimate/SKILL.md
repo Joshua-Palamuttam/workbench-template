@@ -4,6 +4,8 @@ description: Produce realistic time estimates for engineering tasks. Breaks down
 argument-hint: <task description or Jira ticket ID>
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Time Estimator
 
 Produce realistic time estimates for engineering tasks, specifically calibrated for someone who chronically underestimates.

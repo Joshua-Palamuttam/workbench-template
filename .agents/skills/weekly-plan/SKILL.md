@@ -3,6 +3,8 @@ name: weekly-plan
 description: Create and maintain a realistic weekly capacity plan. Tracks actuals vs estimates, checks if new tasks fit, and manages the weekly cycle. Run Monday mornings.
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Weekly Plan
 
 Create and maintain a realistic capacity plan for the week, track actuals vs estimates, and answer "can I fit this in?"

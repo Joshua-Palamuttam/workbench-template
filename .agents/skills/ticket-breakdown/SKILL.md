@@ -4,6 +4,8 @@ description: Decompose a Jira epic or story into estimated subtasks including hi
 argument-hint: <ticket-id>
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Ticket Breakdown
 
 Decompose a Jira epic or story into estimated implementation subtasks, including the hidden work that people always forget.

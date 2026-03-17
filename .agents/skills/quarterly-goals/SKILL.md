@@ -3,6 +3,8 @@ name: quarterly-goals
 description: Track quarterly goals across teams. Set up new goals, add mid-quarter priorities, run weekly goal checks, and assess capacity impact of scope changes.
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Quarterly Goals Tracker
 
 Track progress against quarterly objectives across all teams, ensure weekly work ladders up to these goals, and flag when things are off track.

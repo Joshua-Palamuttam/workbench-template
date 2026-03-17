@@ -19,7 +19,17 @@ Run the diagnostic script and present results conversationally.
    - Shell profile not configured? Offer to add the source line
 5. If everything passes, confirm the environment is healthy
 
+## Skill Validation
+
+After the environment diagnostics, also run `bash "$REPO_ROOT/scripts/validate-skills.sh"` to check:
+- Every skill directory has a SKILL.md with valid frontmatter
+- Global skills in config.yaml have matching directories
+- No broken symlinks in .claude/skills/
+- Python hooks are syntactically valid and have the WB_HOOKS_DISABLED kill switch
+
+Present skill validation results alongside the environment diagnostics.
+
 ## Example Invocation
 
 User: /doctor
-Agent: Runs scripts/doctor.sh, parses output, presents findings with fix suggestions
+Agent: Runs scripts/doctor.sh, then scripts/validate-skills.sh, parses output, presents findings with fix suggestions

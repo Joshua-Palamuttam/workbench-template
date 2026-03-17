@@ -4,6 +4,8 @@ description: Generate a stakeholder-ready status update organized by quarterly g
 argument-hint: [format] [audience]
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Status Report Generator
 
 Produce a concise stakeholder-ready status update from the week's work, organized by quarterly goals.

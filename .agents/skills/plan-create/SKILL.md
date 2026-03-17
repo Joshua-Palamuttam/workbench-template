@@ -4,6 +4,8 @@ description: Create a strategic feature plan with work breakdown and a handoff p
 argument-hint: <plan-name>
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Plan Create
 
 Create a strategic feature plan with work breakdown and a handoff prompt ready to paste into the target repo. This skill interviews the user to resolve all ambiguities, synthesizes research and analysis artifacts, and produces two deliverables: a `plan.md` (strategic plan) and a `handoff.md` (ready-to-paste prompt for implementation).

@@ -3,6 +3,8 @@ name: morning-triage
 description: Scan DMs, @mentions, Slack channels, and Jira to create a prioritized daily plan. Run this every morning to start the day focused.
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Morning Triage
 
 Scan all relevant channels, check DMs and @mentions, check Jira, and create a prioritized daily plan.

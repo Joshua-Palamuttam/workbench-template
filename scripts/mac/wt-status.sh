@@ -1,12 +1,20 @@
 #!/bin/bash
 # wt-status.sh - Show status of all worktrees across repos (macOS)
-# Usage: wt-status [repo_name]
+# Usage: wt-status [repo_name] [--dirty]
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/wt-lib.sh"
 
 WORKTREE_ROOT="${WORKTREE_ROOT:-$HOME/Developer/worktrees}"
-repo_filter="$1"
+repo_filter=""
+dirty_only=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dirty) dirty_only=true; shift ;;
+        *) repo_filter="$1"; shift ;;
+    esac
+done
 
 cd "$WORKTREE_ROOT"
 
@@ -48,6 +56,9 @@ for repo in *.git/; do
                 [[ "$ahead" -gt 0 ]] && sync+=" ${GREEN}+${ahead}${NC}"
                 [[ "$behind" -gt 0 ]] && sync+=" ${RED}-${behind}${NC}"
 
+                if [[ "$dirty_only" == true && "$changes" -eq 0 ]]; then
+                    continue
+                fi
                 printf "  %-20s %-30s %b%b\n" "$wt_name" "$branch" "$status" "$sync"
             fi
         fi

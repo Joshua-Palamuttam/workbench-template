@@ -23,6 +23,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Parse GitHub PR URL if provided (e.g., https://github.com/org/repo/pull/123)
+if [[ "$pr_input" =~ github\.com/.*/pull/([0-9]+) ]]; then
+    pr_input="${BASH_REMATCH[1]}"
+fi
+
 if [ -z "$pr_input" ]; then
     echo "Usage: wt-review <pr_number_or_branch>"
     echo "Examples:"

@@ -4,6 +4,8 @@ description: Handle urgent interrupt requests. Sizes the impact, shows tradeoffs
 argument-hint: <interrupt description>
 ---
 
+> **Path resolution**: This skill may run from any repo. All `context/` and `config.yaml` paths are relative to the **workbench root**, not the current working directory. Read `~/.claude/workbench-root` to get the absolute workbench path, then prepend it to all `context/` and `config.yaml` references. See [PATHS.md](../../PATHS.md).
+
 # Interrupt Handler
 
 Someone just said "this is urgent, it needs to happen now." This skill makes the tradeoffs visible so a good decision gets made fast.

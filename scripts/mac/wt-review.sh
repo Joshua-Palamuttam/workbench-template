@@ -7,7 +7,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/wt-lib.sh"
 
 pr_input="$1"
-[[ -z "$pr_input" ]] && { echo "Usage: wt-review <pr_number_or_branch>"; exit 1; }
+[[ -z "$pr_input" ]] && { echo "Usage: wt-review <pr_number_or_branch_or_url>"; exit 1; }
+
+# Parse GitHub PR URL if provided (e.g., https://github.com/org/repo/pull/123)
+if [[ "$pr_input" =~ github\.com/.*/pull/([0-9]+) ]]; then
+    pr_input="${BASH_REMATCH[1]}"
+fi
 
 invoking_wt=$(git rev-parse --show-toplevel 2>/dev/null) || true
 repo_root=$(get_repo_root)

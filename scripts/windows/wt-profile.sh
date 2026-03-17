@@ -69,6 +69,23 @@ wt-remove() {
 }
 
 # ============================================================
+# Claude Launchers (cc/ccd are global aliases set up by setup.sh)
+# ============================================================
+
+# Navigate to worktree and launch claude
+wtc() { wtn "$@" && claude; }
+
+# Navigate to worktree and launch claude --dangerously-skip-permissions
+wtcd() { wtn "$@" && claude --dangerously-skip-permissions; }
+
+# ============================================================
+# Aliases
+# ============================================================
+
+alias wtrm='wt-remove'
+alias wtg='wtn'
+
+# ============================================================
 # Quick Navigation
 # ============================================================
 
@@ -122,6 +139,26 @@ wtl() {
 
 # Interactive navigation (use -c to launch Claude Code after)
 wtn() {
+    # Handle wtn - (go to last worktree)
+    if [ "$1" = "-" ]; then
+        if [ -f ~/.wt_last ]; then
+            local last_dir=$(cat ~/.wt_last)
+            if [ -d "$last_dir" ]; then
+                echo "$(pwd)" > ~/.wt_last
+                cd "$last_dir"
+                echo "$(pwd)"
+                return 0
+            else
+                echo "Last worktree no longer exists: $last_dir"
+                return 1
+            fi
+        else
+            echo "No previous worktree"
+            return 1
+        fi
+    fi
+    # Save current dir before navigating
+    echo "$(pwd)" > ~/.wt_last
     source "$WORKTREE_SCRIPTS/wtn.sh" "$@"
 }
 
@@ -172,10 +209,56 @@ _wtr_completions() {
     COMPREPLY=($(compgen -W "$repos" -- "${COMP_WORDS[1]}"))
 }
 
+_wt_remove_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+
+    # Complete flags
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "-f --force -d --delete-branch -k --keep-branch -y --yes --stale" -- "$cur"))
+        return
+    fi
+
+    # Complete worktree names
+    local repo_root=$(git rev-parse --git-common-dir 2>/dev/null || git rev-parse --git-dir 2>/dev/null)
+    [ -z "$repo_root" ] && return
+    local names=""
+    for kind in _feature _hotfix _review; do
+        [ -d "$repo_root/$kind" ] || continue
+        for d in "$repo_root/$kind"/*/; do
+            [ -d "$d" ] && names+="$(basename "$d") "
+        done
+    done
+    COMPREPLY=($(compgen -W "$names" -- "$cur"))
+}
+
+_wtn_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "-c --code -" -- "$cur"))
+        return
+    fi
+}
+
+_wt_status_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "--dirty" -- "$cur"))
+        return
+    fi
+    local repos=$(ls -1 "$WORKTREE_ROOT" 2>/dev/null | grep '\.git$' | sed 's/\.git$//')
+    COMPREPLY=($(compgen -W "$repos" -- "$cur"))
+}
+
 if [ -n "$BASH_VERSION" ]; then
     complete -F _wtr_completions wtr
     complete -F _wtr_completions wtd
     complete -F _wtr_completions wtm
+    complete -F _wt_remove_completions wt-remove
+    complete -F _wt_remove_completions wtrm
+    complete -F _wt_remove_completions wt-hotfix-done
+    complete -F _wtn_completions wtn
+    complete -F _wtn_completions wtg
+    complete -F _wt_status_completions wt-status
 fi
 
 # ============================================================
